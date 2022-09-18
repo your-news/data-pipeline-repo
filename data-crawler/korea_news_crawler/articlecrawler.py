@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8, euc-kr -*-
-import io
 import os
 import platform
 import calendar
@@ -12,9 +11,9 @@ from exceptions import InvalidDay, InvalidYear, InvalidCategory, InvalidMonth, O
     OverbalanceDay, ResponseTimeout
 from articleparser import ArticleParser
 from writer import Writer
+from logwriter import LogWriter
 import datetime
 import sys
-import socket
 from pathlib import Path
 
 [sys.path.append(i) for i in ['.', '..']]
@@ -151,6 +150,8 @@ class ArticleCrawler(object):
         writer.write_row(["date", "section", "press", "author", "title", "contents",
                           "imageUrl", "url"])
 
+        log_writer = LogWriter(category='news', article_category=section, date=self.date)
+
         # 기사 url 형식
         url_format = f'http://news.naver.com/main/list.nhn?mode=LSD&mid=sec&sid1={self.categories.get(section)}&date='
         # start_year년 start_month월 start_day일 부터 ~ end_year년 end_month월 end_day일까지 기사를 수집합니다.
@@ -158,7 +159,11 @@ class ArticleCrawler(object):
         print(f'{section} Urls are generated')
 
         print(f'{section} is collecting ...')
+        i = 0
+        acc = 0
         for url in target_urls:
+
+            j = 0
 
             request = self.get_url_data(url)
             document = BeautifulSoup(request.content, 'html.parser')
@@ -253,7 +258,16 @@ class ArticleCrawler(object):
                     writer.write_row([time, section, press, author, title, contents,
                                       image_url, origin_url])
 
+                    i += 1
+                    j += 1
+                    now = datetime.datetime.now()
 
+                    # 데이터 100개 단위마다 LOG CSV 작성
+                    if i % 100 == 0:
+                        print(i, acc, now.strftime("%m/%d, %H:%M:%S"), time.split("T")[0])
+                        log_writer.write_row([i, acc, now.strftime("%m/%d, %H:%M:%S"), time.split("T")[0]])
+                    else:
+                        continue
 
                     del time
                     del press, contents, title, author, image_url
@@ -265,7 +279,11 @@ class ArticleCrawler(object):
                     del request_content, document_content
                     pass
         writer.close()
+        log_writer.close()
 
+        print('crawling is finish...')
+        print('crawling is finish...')
+        print('crawling is finish...')
 
 
     def start(self):
