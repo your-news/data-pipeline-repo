@@ -147,8 +147,8 @@ class ArticleCrawler(object):
 
         s3 = boto3.client('s3',
                           region_name='ap-northeast-2',
-                          aws_access_key_id='',
-                          aws_secret_access_key='')
+                          aws_access_key_id='AKIAQSZOT42WYGBLNIWR',
+                          aws_secret_access_key='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')
 
         # Multi Process PID
         print(section + " PID: " + str(os.getpid()))
@@ -298,8 +298,26 @@ class ArticleCrawler(object):
         recent_file = sorted_file_list[0]
         recent_file_name = recent_file[0]
 
+        # 로그 파일 이름 불러오기
+        files_path = "../log_output/"
+        file_name_and_time_list = []
+        for f_name in os.listdir(f"{files_path}"):
+            written_time = os.path.getctime(f"{files_path}{f_name}")
+            file_name_and_time_list.append((f_name, written_time))
+        sorted_file_list = sorted(file_name_and_time_list, key=lambda x: x[1], reverse=True)
+        recent_file = sorted_file_list[0]
+        log_recent_file_name = recent_file[0]
+
         # 크롤링 파일 s3 bucket에 전송
         s3.upload_file(f'../output/{recent_file_name}', 'yournewsbucket', f'{socket.gethostname()}/{recent_file_name}')
+
+        # 완료된 로그 파일, 크롤링 파일 위치 변경
+        completion_path = f'../completion'
+        if os.path.exists(completion_path) is not True:
+            os.mkdir(completion_path)
+
+        Path(f"../output/{recent_file_name}").rename(f"../completion/{recent_file_name}")
+        Path(f"../log_output/{log_recent_file_name}").rename(f"../completion/{log_recent_file_name}")
 
         print(f'{recent_file_name} crawling is finish...')
         print(f'{recent_file_name} crawling is finish...')
