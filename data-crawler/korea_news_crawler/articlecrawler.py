@@ -14,6 +14,8 @@ from writer import Writer
 from logwriter import LogWriter
 import datetime
 import sys
+import boto3
+import socket
 from pathlib import Path
 
 [sys.path.append(i) for i in ['.', '..']]
@@ -142,6 +144,11 @@ class ArticleCrawler(object):
         raise ResponseTimeout()
 
     def crawling(self, section):
+
+        s3 = boto3.client('s3',
+                          region_name='ap-northeast-2',
+                          aws_access_key_id='',
+                          aws_secret_access_key='')
 
         # Multi Process PID
         print(section + " PID: " + str(os.getpid()))
@@ -281,9 +288,22 @@ class ArticleCrawler(object):
         writer.close()
         log_writer.close()
 
-        print('crawling is finish...')
-        print('crawling is finish...')
-        print('crawling is finish...')
+        # 크롤링 파일 이름 불러오기
+        files_path = "../output/"
+        file_name_and_time_list = []
+        for f_name in os.listdir(f"{files_path}"):
+            written_time = os.path.getctime(f"{files_path}{f_name}")
+            file_name_and_time_list.append((f_name, written_time))
+        sorted_file_list = sorted(file_name_and_time_list, key=lambda x: x[1], reverse=True)
+        recent_file = sorted_file_list[0]
+        recent_file_name = recent_file[0]
+
+        # 크롤링 파일 s3 bucket에 전송
+        s3.upload_file(f'../output/{recent_file_name}', 'yournewsbucket', f'{socket.gethostname()}/{recent_file_name}')
+
+        print(f'{recent_file_name} crawling is finish...')
+        print(f'{recent_file_name} crawling is finish...')
+        print(f'{recent_file_name} crawling is finish...')
 
 
     def start(self):
