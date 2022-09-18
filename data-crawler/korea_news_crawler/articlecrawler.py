@@ -6,7 +6,6 @@ import calendar
 import requests
 from time import sleep
 from bs4 import BeautifulSoup
-from multiprocessing import Process
 from exceptions import InvalidDay, InvalidYear, InvalidCategory, InvalidMonth, OverbalanceMonth, \
     OverbalanceDay, ResponseTimeout
 from articleparser import ArticleParser
@@ -19,7 +18,6 @@ import socket
 from pathlib import Path
 
 [sys.path.append(i) for i in ['.', '..']]
-
 
 class ArticleCrawler(object):
 
@@ -324,17 +322,11 @@ class ArticleCrawler(object):
         print(f'{recent_file_name} crawling is finish...')
 
 
-    def start(self):
-        # MultiProcess 크롤링 시작
-        for category_name in self.selected_categories:
-            proc = Process(target=self.crawling, args=(category_name,))
-            proc.start()
-
 if __name__ == "__main__":
     Crawler = ArticleCrawler()
     # elf.categories = {'정치': 100, '경제': 101, '사회': 102, '문화': 103, '국제': 104, 'IT과학': 105}
-    Crawler.set_category(str(sys.argv[1]))
     # Crawler.set_category('정치')
-    Crawler.set_date_range(str(sys.argv[2]), str(sys.argv[3]))
+    Crawler.set_category(str(sys.argv[1]))
     # Crawler.set_date_range('2018-1-1', '2018-1-1')
+    Crawler.set_date_range(str(sys.argv[2]), str(sys.argv[3]))
     Crawler.start()
