@@ -1,9 +1,9 @@
 import csv
 import platform
-from korea_news_crawler.exceptions import *
+from exceptions import *
 
 
-class Writer(object):
+class LogWriter(object):
     def __init__(self, category, article_category, date):
         self.start_year = date['start_year']
         self.start_month = f'0{date["start_month"]}' if len(str(date['start_month'])) == 1 else str(date['start_month'])
@@ -17,11 +17,11 @@ class Writer(object):
         self.csv_writer = csv.writer(self.file)
 
     def initialize_file(self, category, article_category):
-        output_path = f'../output'
+        output_path = f'../log_output'
         if os.path.exists(output_path) is not True:
             os.mkdir(output_path)
 
-        file_name = f'{output_path}/{category}_{article_category}_{self.start_year}{self.start_month}{self.start_day}_{self.end_year}{self.end_month}{self.end_day}.csv'
+        file_name = f'{output_path}/log_{category}_{article_category}_{self.start_year}{self.start_month}{self.start_day}_{self.end_year}{self.end_month}{self.end_day}.csv'
         if os.path.isfile(file_name) and os.path.getsize(file_name) != 0:
             raise ExistFile(file_name)
 
