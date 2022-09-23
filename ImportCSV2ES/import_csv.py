@@ -4,7 +4,8 @@ import csv
 import time
 import ctypes as ct
 
-es = Elasticsearch(['http://elasticsearch-server-ip:9200/'], port=9200)
+# socket timeout 시 재시도 옵션
+es = Elasticsearch(['http://elasticsearch-server-ip:9200/'], port=, timeout=30, max_retries=10, retry_on_timeout=True)
 
 # csv 파일 디렉토리 변수 초기화
 dir_path = "E:\\news2"
