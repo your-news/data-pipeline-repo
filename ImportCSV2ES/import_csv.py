@@ -9,6 +9,9 @@ es = Elasticsearch(['http://elasticsearch-server-ip:9200/'], port=9200)
 # csv 파일 디렉토리 변수 초기화
 dir_path = "E:\\news2"
 
+# csv field 에러 처리를 위한 limit 사이즈 확장
+csv.field_size_limit(int(ct.c_ulong(-1).value // 2))
+
 # Bulk data 삽입 시간 측정
 before = round(time.time())
 print("데이터 삽입 전 시간 :", time.strftime('%c', time.localtime(before)))
