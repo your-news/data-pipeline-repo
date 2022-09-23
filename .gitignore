@@ -1,0 +1,13 @@
+===== common =====
+*/.idea
+*/__pycache__
+*/build
+*/output
+
+===== data-crawler =====
+data-crawler/KoreaNewsCrawler.egg-info
+data-crawler/MENIFEST.in
+
+
+===== data-loader =====
+*/venv
